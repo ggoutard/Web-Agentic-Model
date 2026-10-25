@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cubi · API locale</title>
+    <style>
+        :root { color-scheme: light dark; }
+        body { margin: 0; font: 15px/1.6 system-ui, sans-serif; background: Canvas; color: CanvasText; }
+        main { display: none; max-width: 720px; margin: 0 auto; padding: 32px 16px; }
+        body[data-standalone] main { display: block; }
+        pre { overflow-x: auto; padding: 12px 14px; border-radius: 8px; background: color-mix(in srgb, CanvasText 7%, Canvas); font-size: 13px; }
+        code { font-size: 0.92em; }
+    </style>
+</head>
+<body>
+    <!-- Dans une page, cette page reste invisible : elle porte le modèle. Ouverte seule, elle explique comment l'utiliser. -->
+    <main>
+        <h1>Cubi, l'IA locale de Logical</h1>
+        <p>Un modèle de langage qui tourne dans le navigateur (WebGPU), sans serveur ni compte. Une page l'intègre en une ligne, puis lui confie des petites tâches : répondre, corriger, reformuler. On suit ce qu'il fait et sa réflexion au fil de l'eau.</p>
+        <pre><code>&lt;script type="module"&gt;
+import { connect } from "https://ggoutard.github.io/Web-Agentic-Model/sdk/cubi.js";
+
+const cubi = connect();                     // mode léger : rien d'affiché
+cubi.on("state", (s) =&gt; console.log(s.phase, s.progress));
+
+const { text } = await cubi.ask("Résume ce texte", {
+    document: document.body.innerText,      // il lit tout
+    onStep: (s) =&gt; console.log(s),          // ce qu'il fait
+    onThought: (t) =&gt; console.log(t),       // sa réflexion
+    onText: (t) =&gt; console.log(t),          // sa réponse, au fil de l'eau
+});
+&lt;/script&gt;</code></pre>
+        <p>Avec le personnage : <code>connect({ ui: true, container })</code> (pages du même site seulement).</p>
+    </main>
+    <script type="module" src="js/api/host.js"></script>
+</body>
+</html>

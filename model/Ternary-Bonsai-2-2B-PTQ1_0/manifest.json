@@ -1,0 +1,28 @@
+{
+  "file": "Ternary-Bonsai-2-2B-PTQ1_0.gguf",
+  "source": "https://huggingface.co/prism-ml/Ternary-Bonsai-2-2B-gguf",
+  "size": 429183456,
+  "sha256": "36061ad406df8a4903a6db005be350c50fabfaf717f9ef0acf4b76adcd9929fa",
+  "parts": [
+    {
+      "name": "part-00.bin",
+      "size": 95000000
+    },
+    {
+      "name": "part-01.bin",
+      "size": 95000000
+    },
+    {
+      "name": "part-02.bin",
+      "size": 95000000
+    },
+    {
+      "name": "part-03.bin",
+      "size": 95000000
+    },
+    {
+      "name": "part-04.bin",
+      "size": 49183456
+    }
+  ]
+}

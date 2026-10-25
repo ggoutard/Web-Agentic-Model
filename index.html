@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Une secrétaire IA qui s'exécute entièrement dans votre navigateur : vos documents ne quittent jamais votre ordinateur.">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#050506">
+    <title>Cubi — votre secrétaire IA locale</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='4' width='24' height='24' rx='7' fill='%238ecbf0'/%3E%3Ccircle cx='12.5' cy='15' r='2.2' fill='%230b0b10'/%3E%3Ccircle cx='19.5' cy='15' r='2.2' fill='%230b0b10'/%3E%3C/svg%3E">
+    <link rel="preload" href="fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app" class="app" data-boot="loading">
+        <header class="topbar">
+            <div class="topbar-start">
+                <span id="brand" class="brand">Cubi</span>
+            </div>
+            <div class="topbar-end">
+                <button id="btn-crew" class="icon-btn" type="button" aria-label="Changer de personnage" title="Changer de personnage (scénarios d'exemple)">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15.8 14.2c2.4-.4 4.3 1.1 4.7 4.3"/></svg>
+                </button>
+                <button id="btn-chat" class="icon-btn" type="button" aria-label="Conversation" aria-controls="mission" aria-expanded="false">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg>
+                </button>
+                <button id="btn-mailbox" class="icon-btn count-badge" type="button" aria-label="Boîte aux lettres" data-count="">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8l9 6 9-6"/><rect x="3" y="5" width="18" height="14" rx="2.5"/></svg>
+                </button>
+                <button id="btn-info" class="icon-btn" type="button" aria-label="Notice">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6v.4"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <div class="workspace">
+        <main class="stage">
+            <section class="hero" aria-label="Votre secrétaire">
+                <div class="character-slot">
+                    <div id="character" class="character" role="button" tabindex="0" aria-label="Personnaliser votre secrétaire"></div>
+                    <div id="bubble" class="bubble" role="status" aria-live="polite" hidden></div>
+                </div>
+            </section>
+
+            <div class="dock">
+                <form id="prompt" class="prompt">
+                    <div id="attachments" class="attachments" hidden></div>
+                    <div class="prompt-row">
+                        <button id="btn-attach" class="round-btn count-badge" type="button" aria-label="Documents" data-count="">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+                        </button>
+                        <textarea id="input" rows="1" placeholder="Demander à votre secrétaire"></textarea>
+                        <span class="model-chip" title="Qwen3.5-2B ternaire, exécuté sur votre carte graphique">Local · 2B</span>
+                        <button id="send" class="round-btn send-btn" type="submit" aria-label="Envoyer" disabled>
+                            <svg class="icon-send" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+                            <svg class="icon-stop" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/></svg>
+                        </button>
+                    </div>
+                    <div class="prompt-progress" role="progressbar" aria-label="Chargement du modèle" aria-valuemin="0" aria-valuemax="100"><div id="progress-fill"></div></div>
+                </form>
+                <p id="note" class="note"></p>
+            </div>
+
+            <!-- Visite guidée : pendant le chargement, ou si l'appareil ne peut pas me faire tourner. -->
+            <section id="tour" class="tour" aria-label="Ce que je sais faire" aria-roledescription="carrousel" hidden>
+                <ol class="tour-slides" aria-live="polite">
+                    <li class="tour-slide" data-kind="cube"><span class="tour-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="4"/><circle cx="9.5" cy="11" r="1.2"/><circle cx="14.5" cy="11" r="1.2"/><path d="M10 14.5c1.2 1 2.8 1 4 0"/></svg></span><h2>Bonjour, je suis votre secrétaire</h2><p>Une IA qui tourne directement dans votre navigateur, sans serveur ni abonnement. Voici ce que je sais faire.</p></li>
+                    <li class="tour-slide" data-kind="doc"><span class="tour-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 16h4"/></svg></span><h2>Déposez vos documents</h2><p>Glissez des PDF ou des textes n'importe où sur la page : je les lis, j'en fais une fiche et je les retiens.</p></li>
+                    <li class="tour-slide" data-kind="chat"><span class="tour-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg></span><h2>Posez vos questions</h2><p>La réponse courte s'affiche dans ma bulle ; le détail, mes lectures et chacune de mes actions défilent dans le volet de droite.</p></li>
+                    <li class="tour-slide" data-kind="quote"><span class="tour-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h10l4 4v12H5z"/><path d="M8 11h8" stroke-width="4" stroke="#ffd60a" opacity=".7"/><path d="M8 15h6"/></svg></span><h2>Vérifiez mes sources</h2><p>Cliquez sur une citation [1] : le PDF d'origine s'ouvre à la bonne page, le passage surligné.</p></li>
+                    <li class="tour-slide" data-kind="rank"><span class="tour-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"/></svg></span><h2>Confiez-moi les longues tâches</h2><p>« Quel CV recommandes-tu ? » : je prépare une grille, je note chaque document, vous pouvez me faire des remarques en cours de route, et je rends un rapport en PDF.</p></li>
+                    <li class="tour-slide" data-kind="coffee"><span class="tour-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 11h1.5a2.5 2.5 0 0 1 0 5H16"/><path d="M9 3c-1 1 1 2 0 3M12.5 3c-1 1 1 2 0 3"/></svg></span><h2>Entre deux questions, je vis ma vie</h2><p>Café, lecture, ordinateur… Écrivez-moi et j'arrive.</p></li>
+                </ol>
+                <div class="tour-nav">
+                    <button id="tour-prev" class="icon-btn" type="button" aria-label="Étape précédente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+                    <div id="tour-dots" class="tour-dots"><button type="button" aria-label="Étape 1"></button><button type="button" aria-label="Étape 2"></button><button type="button" aria-label="Étape 3"></button><button type="button" aria-label="Étape 4"></button><button type="button" aria-label="Étape 5"></button><button type="button" aria-label="Étape 6"></button></div>
+                    <button id="tour-next" class="icon-btn" type="button" aria-label="Étape suivante"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+                </div>
+            </section>
+        </main>
+
+        <aside id="mission" class="mission" aria-label="Conversation">
+            <div class="mission-inner">
+                <header class="mission-head">
+                    <h2>Conversation</h2>
+                    <button id="mission-close" class="icon-btn" type="button" aria-label="Fermer la conversation"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+                </header>
+                <ol id="chat-log" class="chat-log" aria-live="polite"></ol>
+                <p id="chat-empty" class="chat-empty">Vos échanges et tout ce que fait votre secrétaire apparaîtront ici.</p>
+            </div>
+        </aside>
+        </div>
+
+        <div id="viewer" class="viewer" role="dialog" aria-modal="true" aria-labelledby="viewer-name" hidden>
+            <header class="viewer-bar">
+                <svg class="viewer-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></svg>
+                <p class="viewer-title"><b id="viewer-name"></b><span id="viewer-page"></span></p>
+                <button id="viewer-prev" class="icon-btn" type="button" aria-label="Page précédente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+                <button id="viewer-next" class="icon-btn" type="button" aria-label="Page suivante"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+                <button id="viewer-close" class="icon-btn" type="button" aria-label="Fermer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+            </header>
+            <div id="viewer-stage" class="viewer-stage"><div id="viewer-sheet" class="viewer-sheet"></div></div>
+            <blockquote id="viewer-quote" class="viewer-quote" hidden></blockquote>
+        </div>
+
+        <div class="dropzone" aria-hidden="true">
+            <p class="dropzone-label">
+                <svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 19h14"/></svg>
+                Déposez vos documents
+            </p>
+        </div>
+
+        <div id="studio-backdrop" class="studio-backdrop"></div>
+        <aside id="studio" class="studio" aria-label="Personnalisation">
+            <header class="studio-head">
+                <button id="studio-close" class="icon-btn" type="button" aria-label="Fermer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+            </header>
+            <label class="name-field">
+                <span class="sr-only">Nom</span>
+                <input id="studio-name" type="text" autocomplete="off" spellcheck="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>
+            </label>
+            <p class="studio-hint">Glissez le personnage pour le faire tourner.</p>
+
+            <div class="studio-panel">
+                <section class="studio-section">
+                    <h2>Personnage</h2>
+                    <div id="studio-crew" class="crew-grid"></div>
+                    <div id="studio-crew-detail" class="crew-detail"></div>
+                </section>
+                <section class="studio-section">
+                    <h2>Couleur</h2>
+                    <div id="studio-colors" class="swatches"></div>
+                </section>
+                <section class="studio-section">
+                    <h2>Accessoires</h2>
+                    <div id="studio-accessories" class="gear-grid"></div>
+                </section>
+                <section class="studio-section">
+                    <h2><label for="studio-mission">Mission</label></h2>
+                    <textarea id="studio-mission" class="mission-input" rows="3" placeholder="Facultatif. Remplace toutes les consignes du modèle. Ex. : Ta mission est de répondre toujours blabla."></textarea>
+                    <p id="studio-mission-count" class="field-count"></p>
+                </section>
+            </div>
+
+        </aside>
+    </div>
+
+    <dialog id="docs-dialog" class="dialog">
+        <form method="dialog" class="dialog-body">
+            <header class="dialog-head">
+                <h2>Documents</h2>
+                <button class="icon-btn" value="close" aria-label="Fermer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+            </header>
+            <p class="dialog-sub">Déposez un fichier n'importe où sur la page : il est lu, résumé puis indexé, uniquement dans ce navigateur.</p>
+            <input id="file-input" type="file" accept=".pdf,.txt,.md,.csv,.json,application/pdf,text/plain,text/markdown" multiple hidden>
+            <button id="btn-import" class="import-btn" type="button">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4M7 9l5-5 5 5M5 15v4a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-4"/></svg>
+                Importer un fichier <span>.pdf, .txt, .md, .csv, .json</span>
+            </button>
+            <ul id="doc-list" class="doc-list"></ul>
+            <p id="doc-empty" class="doc-empty">Aucun document pour l'instant.</p>
+            <label class="field">
+                <span>Coller un texte</span>
+                <textarea id="paste-text" rows="5" placeholder="Collez le contenu d'un document…"></textarea>
+            </label>
+            <footer class="dialog-foot">
+                <button id="btn-sample" class="text-btn" type="button">Charger le document d'exemple</button>
+                <button id="btn-paste" class="solid-btn" type="button" disabled>Ajouter</button>
+            </footer>
+        </form>
+    </dialog>
+
+    <dialog id="mailbox-dialog" class="dialog">
+        <form method="dialog" class="dialog-body">
+            <header class="dialog-head">
+                <h2>Boîte aux lettres</h2>
+                <button class="icon-btn" value="close" aria-label="Fermer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+            </header>
+            <p class="dialog-sub">Les rapports et documents que vous avez demandés à votre secrétaire.</p>
+            <ul id="mailbox-list" class="mailbox-list"></ul>
+            <p id="mailbox-empty" class="doc-empty">Rien pour l'instant.</p>
+        </form>
+    </dialog>
+
+    <dialog id="info-dialog" class="dialog">
+        <form method="dialog" class="dialog-body">
+            <header class="dialog-head">
+                <h2>Notice</h2>
+                <button class="icon-btn" value="close" aria-label="Fermer"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+            </header>
+            <div class="legal">
+                <h3>Nature du projet</h3>
+                <p>Démonstrateur expérimental. Les réponses sont générées de manière probabiliste et peuvent être inexactes ; elles ne constituent pas des conseils professionnels, médicaux, juridiques ou financiers.</p>
+                <h3>Exécution locale</h3>
+                <p>Le modèle s'exécute sur la carte graphique de votre appareil. Le service est fourni « en l'état », sans garantie de disponibilité ni de performance ; l'auteur décline toute responsabilité en cas de ralentissement ou de plantage du navigateur.</p>
+                <h3>Confidentialité</h3>
+                <p>Aucune donnée saisie ni aucune réponse n'est transmise à un serveur. Les documents ajoutés restent dans le stockage local de votre navigateur.</p>
+                <h3>Usage</h3>
+                <p>Interdit pour produire des contenus illicites, haineux ou diffamatoires, concevoir des logiciels malveillants ou enfreindre des droits de propriété intellectuelle.</p>
+                <h3>Crédits</h3>
+                <p>Modèle Ternary-Bonsai-2-2B (PrismML, Apache 2.0), dérivé de Qwen3.5-2B · Three.js (MIT) · pdf.js, Mozilla (Apache 2.0) · jsPDF (MIT) · police Inter (SIL OFL).</p>
+            </div>
+        </form>
+    </dialog>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
