@@ -57,7 +57,7 @@ export function createMissionPanel({ app, toggle, getOwner, onCite = () => {} })
         item.dataset.id = record.id;
         item.innerHTML = `
             <details class="computer">
-                <summary class="computer-bar"><i></i><i></i><i></i><span>Ordinateur de <b></b></span><span class="computer-count"></span><span class="computer-status"></span></summary>
+                <summary class="computer-bar"><span>Ordinateur de <b></b></span><span class="computer-count"></span><span class="computer-status"></span></summary>
                 <ol class="computer-log"></ol>
             </details>
             <ul class="turn-remarks" hidden></ul>

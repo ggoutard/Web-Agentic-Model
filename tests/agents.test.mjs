@@ -184,9 +184,9 @@ test("boucle : le format de réponse suit le mode choisi par l'aiguillage", asyn
 
 test("équipe : un personnage renommé garde son métier ; la mission l'emporte toujours", async () => {
     const { personaPrompt, DEFAULT_PROFILE } = await import("../js/profile.js");
-    const rhea = personaPrompt({ ...DEFAULT_PROFILE, crew: "rhea", name: "Iris" });
-    assert.match(rhea, /^Tu t'appelles Iris\. Tu es chargée de recrutement/);
-    assert.equal(personaPrompt({ ...DEFAULT_PROFILE, crew: "rhea", mission: "Réponds blabla." }), "Réponds blabla.");
+    const clause = personaPrompt({ ...DEFAULT_PROFILE, crew: "clause", name: "Iris" });
+    assert.match(clause, /^Tu t'appelles Iris\. Tu gères les contrats/);
+    assert.equal(personaPrompt({ ...DEFAULT_PROFILE, crew: "clause", mission: "Réponds blabla." }), "Réponds blabla.");
 });
 
 test("outils : lire_document retrouve un document par une partie de son nom", async () => {

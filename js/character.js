@@ -243,9 +243,10 @@ export function createCharacter(container, { color = "#7cc6f2", accessories = []
             blinkUntil = t + 0.12;
             nextBlink = t + 2.5 + Math.random() * 3;
         }
-        // Les yeux se ferment de plaisir pendant la gorgée de café.
-        const closed = !awake || t < blinkUntil || sipping > 0.6;
-        eyes.scale.y += ((closed ? 0.08 : 1) - eyes.scale.y) * damp(0.35);
+        // Pendant la pause café, il savoure les yeux fermés (reflets cachés).
+        const closed = !awake || t < blinkUntil || activity === "coffee";
+        eyes.scale.y += ((closed ? 0.04 : 1) - eyes.scale.y) * damp(0.35);
+        for (const glint of eyes.userData.glints) glint.visible = eyes.scale.y > 0.3;
 
         // Bouche.
         const happy = gesture.name === "hop" || gesture.name === "wave" || docMode === "await" || activity === "coffee";
@@ -537,6 +538,7 @@ function buildBody(color) {
         const glint = new THREE.Mesh(new THREE.SphereGeometry(0.055, 12, 8), glintMaterial);
         glint.position.set(side * 0.36 + 0.065, 0.21, FACE_Z + 0.095);
         eyes.add(eye, glint);
+        (eyes.userData.glints ??= []).push(glint);
     }
     rig.add(eyes);
 

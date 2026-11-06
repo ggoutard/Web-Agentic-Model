@@ -29,9 +29,9 @@ Ouvrez **Changer de personnage** (icône en haut à droite) :
 | Personnage | Métier | Scénario fictif |
 |---|---|---|
 | Cubi | secrétaire polyvalente | guide interne d'une entreprise (bouton « Charger le document d'exemple ») |
-| Rhéa | recrutement | une offre et 3 CV : « Quel CV recommandes-tu ? » |
+| Clause | contrats | 2 contrats : « Quand dois-je résilier, et que se passe-t-il si je rate la date ? » |
 | Plume | courrier | 3 lettres : tri par urgence, échéances, réponse |
-| Abaque | notes de frais | 2 notes de frais et la politique interne : contrôle ligne à ligne |
+| Centime | notes de frais | 2 notes de frais et la politique interne : contrôle ligne à ligne |
 
 Chaque personnage appelle lui-même ses outils (lire un document, calculer, dater, rédiger une note) : chaque appel apparaît comme une étape dans la conversation.
 
@@ -50,3 +50,12 @@ npm test
 - `js/vendor/` : bibliothèques embarquées (moteur Bonsai, wllama, Three.js, pdf.js, jsPDF)
 - `model/` : le modèle Bonsai découpé en morceaux de 95 Mo (limite GitHub de 100 Mo par fichier)
 - `api.html`, `sdk/cubi.js` : utiliser l'IA locale depuis une autre page
+
+## Licences et mentions légales
+
+- Code original : licence MIT (`LICENSE`).
+- Conditions d'utilisation et limites de responsabilité du démonstrateur : `TERMS.md`.
+- Modèle Ternary-Bonsai-2-2B de Prism ML (Apache 2.0, construit à partir de Qwen3.5-2B) : licence et notice dans `model/`. *Created using Bonsai by Prism ML.*
+- Bibliothèques et polices tierces : `THIRD_PARTY_NOTICES.md`.
+- Le modèle de secours (Qwen3.5-0.8B) est téléchargé depuis Hugging Face, qui reçoit l'adresse IP de l'utilisateur ; aucun document n'est transmis.
+- Démonstration uniquement : ne pas utiliser pour décider du sort de personnes (recrutement, crédit…). Tous les documents d'exemple sont fictifs.

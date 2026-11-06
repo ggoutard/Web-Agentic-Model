@@ -2,29 +2,21 @@
 // Chacun arrive avec son style (couleur, accessoires, entrée en scène), son métier, ses outils
 // (appels de fonction, voir agents/tools.js) et un scénario fictif pour l'essayer sans données réelles.
 
-const OFFRE = `Offre d'emploi — Développeur·se front-end (fictive)
-Atelier Lumen, Lyon. CDI, temps plein, télétravail 2 jours par semaine.
-Missions : développer le configurateur 3D de luminaires en ligne, maintenir le site vitrine, travailler avec les designers.
-Profil recherché : au moins 3 ans d'expérience en JavaScript et React ; Three.js ou WebGL très apprécié ; sens du design ; anglais technique.
-Salaire : 42 000 à 48 000 euros brut par an selon expérience. Prise de poste souhaitée : le 1er février.`;
+const CONTRAT_MAINTENANCE = `Contrat de maintenance informatique n° 2024-017 (fictif)
+Entre Nexa Services (le prestataire) et Atelier Lumen (le client).
+Article 1 — Durée : le contrat prend effet le 1er mars 2024 pour 36 mois, soit jusqu'au 28 février 2027.
+Article 2 — Reconduction : à son échéance, le contrat est reconduit tacitement par périodes successives de 12 mois.
+Article 3 — Résiliation : le client peut résilier à l'échéance par lettre recommandée, au moins 90 jours calendaires avant la date d'échéance. Passé ce délai, la reconduction de 12 mois s'applique.
+Article 4 — Prix : 1 450 euros HT par mois, révisés de 3 % chaque 1er mars.
+Article 5 — Sortie anticipée : en cas de résiliation avant l'échéance, le client verse 50 % des mensualités restantes.
+Article 6 — Exclusivité : le client s'interdit de confier la maintenance de son parc à un autre prestataire pendant la durée du contrat.`;
 
-const CV_LEA = `CV — Léa Martin (fictif)
-Développeuse front-end, Lyon. Disponible sous 1 mois.
-Expérience : 2021-2025, Studio Pixel (Lyon) : sites e-commerce en React et TypeScript, refonte du tunnel de paiement. 2019-2021, agence Nova : intégration HTML/CSS et JavaScript.
-Compétences : React, TypeScript, Three.js (projet personnel : visite 3D d'appartement), Figma, anglais courant.
-Formation : licence professionnelle Web, Lyon 1. Prétentions : 45 000 euros.`;
-
-const CV_KARIM = `CV — Karim Benali (fictif)
-Développeur full-stack, Grenoble. Disponible immédiatement.
-Expérience : 2018-2025, Logistix : applications internes en Angular et Java, API REST, base de données PostgreSQL. 2016-2018, stage puis CDD en support technique.
-Compétences : Angular, Java, Spring, SQL, un peu de React (formation en ligne en 2024), anglais intermédiaire.
-Formation : DUT informatique. Prétentions : 50 000 euros.`;
-
-const CV_SOFIA = `CV — Sofia Rossi (fictif)
-Développeuse créative WebGL, Milan puis Lyon. Disponible dans 3 mois.
-Expérience : 2022-2025, agence Lumina (Milan) : expériences 3D interactives en Three.js et React Three Fiber pour des marques de design. 2021-2022, freelance : animations web.
-Compétences : Three.js, WebGL, GLSL, React, Blender, anglais et italien courants, français professionnel.
-Formation : master design interactif, Politecnico di Milano. Prétentions : 44 000 euros.`;
+const CONTRAT_COPIEUR = `Contrat de location de photocopieur n° L-8841 (fictif)
+Entre Copyrex (le loueur) et Atelier Lumen (le locataire).
+Article 1 — Durée : la location débute le 1er juin 2025 pour 48 mois, soit jusqu'au 31 mai 2029.
+Article 2 — Reconduction : à l'échéance, la location se poursuit par périodes de 12 mois, sauf congé donné par lettre recommandée au moins 180 jours calendaires avant l'échéance.
+Article 3 — Loyer : 290 euros HT par mois, copies en noir et blanc incluses ; 0,04 euro HT la copie couleur.
+Article 4 — Sortie anticipée : en cas de résiliation avant l'échéance, le locataire verse 100 % des loyers restants.`;
 
 const LETTRE_CLIENT = `Lettre reçue le 20 octobre — Mme Hélène Perrin, Annecy (fictive)
 Objet : suspension Arc livrée cassée
@@ -68,39 +60,37 @@ export const CREW = [
         scenario: null,
     },
     {
-        id: "rhea",
-        name: "Rhéa",
-        role: "Recrutement",
-        color: "#b4a4f0",
+        id: "clause",
+        name: "Clause",
+        role: "Contrats",
+        color: "#e88fb4",
         accessories: ["lunettes", "noeud"],
         entrance: "spin",
-        pitch: "Chargée de recrutement : compare des CV à une offre, repère les écarts, prépare la présélection.",
+        pitch: "Gestionnaire de contrats : repère les clauses à risque, calcule les dates limites de résiliation, prépare le rappel. Ne remplace pas un avocat.",
         useCases: [
-            "Présélectionner les candidats d'une offre",
-            "Vérifier qu'un profil coche les critères obligatoires",
-            "Calculer les années d'expérience et l'écart de salaire",
-            "Rédiger une note de synthèse pour le manager",
+            "Trouver la date limite pour résilier un contrat",
+            "Repérer reconduction tacite, pénalités et exclusivité",
+            "Chiffrer le coût d'une sortie anticipée",
+            "Rédiger une note de rappel pour ne pas rater l'échéance",
         ],
-        persona: "Tu t'appelles Rhéa. Tu es chargée de recrutement : rigoureuse, factuelle et bienveillante envers les candidats. Tu ne juges que les compétences et l'expérience, jamais l'âge, le genre ou l'origine.",
+        persona: "Tu t'appelles Clause. Tu gères les contrats de l'entreprise : méthodique, tu cites toujours l'article concerné, tu calcules les dates et les montants et tu rappelles que tu n'es pas juriste quand une décision engage l'entreprise.",
         agent: {
-            instructions: "Pour comparer des candidats : appelle lister_documents, puis lire_document pour l'offre et pour chaque CV utile. Compare chaque profil aux critères de l'offre. Fais les calculs (années d'expérience, écart de salaire) avec calculer, jamais de tête. Si on te demande une note ou une synthèse, enregistre-la avec creer_note.",
-            tools: ["lister_documents", "lire_document", "calculer", "creer_note"],
+            instructions: "Pour analyser un contrat : appelle lister_documents puis lire_document. Cite l'article de chaque clause que tu mentionnes. Pour une date limite, récupère la date du jour avec date_actuelle et calcule-la avec decaler_date à partir de la date d'échéance, jamais de tête. Fais les montants avec calculer. Si on te demande une note ou un rappel, enregistre-le avec creer_note. Rappelle que ce n'est pas un conseil juridique.",
+            tools: ["lister_documents", "lire_document", "date_actuelle", "decaler_date", "calculer", "creer_note"],
             maxSteps: 6,
             reasoning: false,
         },
         scenario: {
-            label: "Une offre et 3 CV",
-            story: "L'Atelier Lumen recrute un·e développeur·se front-end pour son configurateur 3D. Trois candidatures sont arrivées.",
+            label: "Deux contrats à surveiller",
+            story: "L'Atelier Lumen a signé un contrat de maintenance informatique et une location de photocopieur. Les deux se reconduisent tout seuls si personne ne réagit.",
             documents: [
-                doc("Offre — Développeur front-end (fictive)", "Offre développeur front-end", "Poste React et Three.js à Lyon, 3 ans d'expérience, 42 à 48 k€.", ["recrutement", "offre d'emploi", "react", "three.js"], OFFRE),
-                doc("CV — Léa Martin (fictif)", "CV Léa Martin", "Développeuse React et TypeScript depuis 2019, un projet Three.js.", ["candidat", "cv", "react", "typescript"], CV_LEA),
-                doc("CV — Karim Benali (fictif)", "CV Karim Benali", "Développeur Angular et Java depuis 2016, React débutant.", ["candidat", "cv", "angular", "java"], CV_KARIM),
-                doc("CV — Sofia Rossi (fictif)", "CV Sofia Rossi", "Développeuse créative Three.js et WebGL depuis 2021.", ["candidat", "cv", "three.js", "webgl"], CV_SOFIA),
+                doc("Contrat — Maintenance informatique Nexa Services (fictif)", "Contrat de maintenance Nexa", "36 mois jusqu'au 28 février 2027, reconduction tacite, préavis de 90 jours, 1 450 € HT par mois.", ["contrat", "maintenance", "résiliation", "reconduction tacite", "préavis"], CONTRAT_MAINTENANCE),
+                doc("Contrat — Location de photocopieur Copyrex (fictif)", "Contrat photocopieur Copyrex", "48 mois jusqu'au 31 mai 2029, préavis de 180 jours, 290 € HT par mois.", ["contrat", "location", "résiliation", "préavis", "photocopieur"], CONTRAT_COPIEUR),
             ],
             prompts: [
-                "Quel CV recommandes-tu pour l'offre de développeur front-end ?",
-                "Lis le CV de Karim Benali : coche-t-il les critères obligatoires de l'offre ?",
-                "Rédige une note de présélection pour le manager avec les 3 candidats.",
+                "Quand dois-je résilier le contrat de maintenance Nexa, et que se passe-t-il si je rate la date ?",
+                "Quelles clauses du contrat de maintenance sont à risque ?",
+                "Rédige une note de rappel pour ne pas manquer la date de résiliation de la maintenance.",
             ],
         },
     },
@@ -142,7 +132,7 @@ export const CREW = [
     },
     {
         id: "abaque",
-        name: "Abaque",
+        name: "Centime",
         role: "Notes de frais",
         color: "#7fd8b4",
         accessories: ["lunettes", "antenne"],
@@ -154,7 +144,7 @@ export const CREW = [
             "Repérer les dépenses qui demandent un accord",
             "Rédiger l'avis motivé pour le salarié",
         ],
-        persona: "Tu t'appelles Abaque. Tu es contrôleur de gestion : précis, neutre, tu justifies chaque décision par une règle écrite et un calcul.",
+        persona: "Tu t'appelles Centime. Tu es contrôleur de gestion : précis, neutre, tu justifies chaque décision par une règle écrite et un calcul.",
         agent: {
             instructions: "Pour contrôler une note de frais : lis la note avec lire_document, cherche chaque règle applicable avec rechercher_documents dans le guide interne, fais tous les calculs avec calculer, jamais de tête. Pour chaque ligne, dis CONFORME ou NON CONFORME avec la règle et le montant de l'écart, puis le total remboursable. Si on te demande un avis, enregistre-le avec creer_note.",
             tools: ["lister_documents", "lire_document", "rechercher_documents", "calculer", "creer_note"],

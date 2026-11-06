@@ -1,4 +1,5 @@
 import { loadEngine, isFirstVisit } from "./engine.js";
+import { autoLoadDecision, loadingMarker } from "./device_guard.js";
 import { LogicalRAGPipeline } from "./rag/pipeline.js";
 import { BonsaiAdapter } from "./rag/model_adapter.js";
 import { KnowledgeBase } from "./knowledge.js";
@@ -734,12 +735,37 @@ function reveal(state) {
     if (state === "ready") setTimeout(() => character?.gesture("wave"), 1300);
 }
 
-async function boot() {
+// Sur mobile, ou si le chargement précédent a fait planter l'onglet, on attend l'accord de l'utilisateur.
+function boot() {
+    const decision = autoLoadDecision({
+        device: { userAgent: navigator.userAgent, platform: navigator.platform, maxTouchPoints: navigator.maxTouchPoints },
+        lastAttempt: loadingMarker.get(),
+    });
+    if (decision.auto) return load();
+    loadingMarker.clear();
+    tour.start();
+    setMood("idle");
+    reveal("error");
+    const message = decision.reason === "crash"
+        ? "La page s'est rechargée pendant mon chargement : cet appareil manque sans doute de mémoire pour mon modèle (429 Mo). Je tourne mieux sur un ordinateur."
+        : "Sur téléphone, mon modèle (429 Mo) dépasse souvent la mémoire du navigateur, qui peut alors fermer la page. Je tourne mieux sur un ordinateur.";
+    bridge.failed(message);
+    setNote(`${escapeHTML(message)} <button type="button" class="text-btn" id="btn-force">Essayer quand même</button>`, { error: true });
+    $("btn-force").addEventListener("click", () => {
+        setNote("");
+        ui.app.dataset.boot = "loading";
+        load();
+    });
+}
+
+async function load() {
     const firstVisit = isFirstVisit();
     setNote(firstVisit ? "Première visite : je télécharge mon modèle une seule fois (429 Mo)." : "Je me réveille…");
     // Le temps du chargement, on montre ce que je sais faire.
     tour.start();
     const eta = createEtaTracker();
+    // Marqueur effacé à la fin : s'il est encore là au prochain démarrage, l'onglet a planté.
+    loadingMarker.set();
 
     try {
         const { engine, backend, model } = await loadEngine({
@@ -761,6 +787,7 @@ async function boot() {
             },
         });
 
+        loadingMarker.clear();
         const adapter = new BonsaiAdapter(engine);
         const pipeline = new LogicalRAGPipeline(adapter);
         knowledge.attach(pipeline);
@@ -773,6 +800,7 @@ async function boot() {
         reveal("ready");
         bridge.ready();
     } catch (error) {
+        loadingMarker.clear();
         console.error("Erreur moteur :", error, { gpu: error.gpuName, étape: error.step, webgpu: error.diagnostic });
         tour.start();
         setMood("sad");
